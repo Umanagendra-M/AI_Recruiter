@@ -23,3 +23,16 @@ phase 2 backlog:
 create the rubric setup(editable)
 
 resume with multicolumns.
+
+
+
+##################################
+## Today's work
+- LLM catches what spaCy NER misses
+- Structured output via Pydantic works
+- Rubric structure defined
+
+## Tomorrow
+- scorer.py
+- Input: NERValidation output + rubric
+- Output: candidate score + justification
