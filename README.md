@@ -27,12 +27,22 @@ resume with multicolumns.
 
 
 ##################################
-## Today's work
-- LLM catches what spaCy NER misses
-- Structured output via Pydantic works
-- Rubric structure defined
+## Phase 1 — COMPLETE 
+Pipeline working end to end.
+PDF → extract → classify → NER → 
+LLM clean → score → JSON output
+
+## Phase 2 Backlog
+- Columnar PDF handling
+- NER model replacement
+- np.float32 serialization fix
+- Score breakdown missing experience_level
+- Deduplicate LLM output
+- Editable rubric UI for Sarah
+- Company domain lookup (Wikipedia Phase 3)
 
 ## Tomorrow
-- scorer.py
-- Input: NERValidation output + rubric
-- Output: candidate score + justification
+- Clean up hardcoded paths
+- Move to proper folder structure
+- Write Sarah demo script
+- Prepare questions for Sarah meeting
