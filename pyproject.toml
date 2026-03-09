@@ -1,0 +1,14 @@
+[project]
+name = "ai-recruiter"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "gliner>=0.2.24",
+    "ollama>=0.6.1",
+    "openai>=2.26.0",
+    "pdfplumber>=0.11.9",
+    "torch>=2.10.0",
+    "transformers>=5.3.0",
+]
