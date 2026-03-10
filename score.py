@@ -4,20 +4,24 @@ import re
 from typing import List
 def extract_years(years_str: str) -> float:
     try:
-        years=float(re.findall('\d+',years_str)[0])
-    except:
-        years =-1.0
-    return years
+        return float(years_str)  # handles integer directly
+    except (ValueError, TypeError):
+        try:
+            return float(re.findall('\d+', str(years_str))[0])
+        except:
+            return -1.0
 def match_list(name: str, 
                   preferred_list: list) -> bool:
     for pref_name in preferred_list:
-        if name.lower().strip() ==pref_name.lower().strip():
+        if pref_name.lower().strip() in name.lower().strip():
             return True
     return False
 
 def check_years_gate(candidate: dict, rubric: dict) -> tuple[bool, str]:
-    years = extract_years(candidate["ideal_output"]["years_experience"])
-    if years < rubric["min_years_of_exp"]:
+
+    print("years of expericene##############",extract_years(candidate["ideal_output"]["years_experience"]))
+    years = float(extract_years(candidate["ideal_output"]["years_experience"]))
+    if years < float(rubric["min_years_of_exp"]):
         return False, f"years not met: needs {rubric['min_years_of_exp']}, has {years}"
     return True, "years met"
 def check_skills_gate(candidate: dict, rubric: dict) -> tuple[bool, str]:
@@ -28,8 +32,18 @@ def check_skills_gate(candidate: dict, rubric: dict) -> tuple[bool, str]:
         return False, f"missing must-have skills: {missing}"
     else:
         return True, "skills met"
-
-
+# def match_domain(candidate_domain: str, 
+#                  rubric_domains: list) -> bool:
+#     for domain in rubric_domains:
+#         if domain.lower() in candidate_domain.lower():
+#             return True
+#     return False
+# def match_title(candidate_title: str,
+#                 preferred_titles: list) -> bool:
+#     for title in preferred_titles:
+#         if title.lower() in candidate_title.lower():
+#             return True
+#     return False
 # def check_hard_gates(candidate: dict,  rubric: dict) -> tuple[bool, str]:
 #     # GATE 1: years
 #     years = extract_years(candidate["ideal_output"]["years_experience"])
@@ -65,7 +79,7 @@ def calculate_score(candidate: dict,
     skillmatch,_= check_skills_gate(candidate,rubric)
     if skillmatch:
         score+=0.25# for skills
-        breakdown['skillmatch']=0.1
+        breakdown['skillmatch']=0.25
 
     exp_match,exp_string=check_years_gate(candidate,rubric)
     if exp_match:

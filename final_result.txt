@@ -1,1 +1,1 @@
-{"final_score": 0.85, "justification": {"domain_relevance": 0.3, "title_match": 0.2, "company_match": 0.1, "skillmatch": 0.1}}
+{"final_score": 1.0, "justification": {"domain_relevance": 0.3, "title_match": 0.2, "company_match": 0.1, "skillmatch": 0.25, "exp_match": 0.15}}
