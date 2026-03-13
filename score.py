@@ -7,7 +7,7 @@ def extract_years(years_str: str) -> float:
         return float(years_str)  # handles integer directly
     except (ValueError, TypeError):
         try:
-            return float(re.findall('\d+', str(years_str))[0])
+            return float(re.findall(r'\d+', str(years_str))[0])
         except:
             return -1.0
 def match_list(name: str, 

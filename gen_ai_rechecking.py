@@ -3,7 +3,7 @@ import openai
 import json
 from pydantic import BaseModel
 from typing import List
-
+import os
 class CandidateDetails(BaseModel):
     name: str
     years_experience: int
@@ -21,8 +21,9 @@ class NERValidation(BaseModel):
 # Ollama client
 
 def validate_and_clean(pages: list) -> dict:
+    ollama_host = os.getenv("OLLAMA_HOST", "http://localhost:11434")
     client = OpenAI(
-        base_url="http://localhost:11434/v1",
+        base_url=f"{ollama_host}/v1",
         api_key="ollama")
     # combine all page text
     full_text = "\n".join([p['page_text'] for p in pages])
