@@ -39,7 +39,7 @@ def validate_and_clean(pages: list) -> dict:
     try:
         completion = client.beta.chat.completions.parse(
             temperature=0,
-            model="gemma2:2b",
+            model="tinyllama:latest",
             messages=[
                 {"role": "user", "content": """
     You are a resume parsing validator.
