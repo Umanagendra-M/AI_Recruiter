@@ -1,1 +1,1 @@
-{"final_score": 0.55, "justification": {"domain_relevance": 0.3, "company_match": 0.1, "exp_match": 0.15}}
+{"final_score": 0.35, "justification": {"title_match": 0.2, "exp_match": 0.15}}

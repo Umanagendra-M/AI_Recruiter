@@ -44,19 +44,26 @@ def validate_and_clean(pages: list) -> dict:
                 {"role": "user", "content": """
     You are a resume parsing validator.
 
-    Given the raw resume text and NER extracted output,
-    return a JSON with:
-    - correctly_extracted: entities NER got right
-    - missed_entities: entities NER missed  
-    - incorrect_entities: entities NER got wrong
-    - ideal_output: what perfect extraction looks like for different companies the person worked for 
-    
+Given the raw resume text and NER extracted output,
+return a JSON with:
+- correctly_extracted: entities NER got right
+- missed_entities: entities NER missed  
+- incorrect_entities: entities NER got wrong
+- ideal_output: perfect extraction with these rules:
+    - name: full name of candidate
+    - years_experience: total years as integer
+    - skills: list of technical skills only
+    - designation: current job title
+    - company_name: most recent company name only
+    - company_core_work_domain: ONE short domain keyword
+      like "Computer Vision" or "Healthcare AI" or "Finance"
+      NOT a sentence, NOT a paragraph, just 2-3 words maximum
 
-    Raw resume text:
-    {0}
+Raw resume text:
+{0}
 
-    NER extracted output:
-    {1}
+NER extracted output:
+{1}
     """.format(full_text, ner_text)}
             ],
             response_format=NERValidation,

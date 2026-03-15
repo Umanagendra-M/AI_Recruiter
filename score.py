@@ -10,9 +10,9 @@ def extract_years(years_str: str) -> float:
             return float(re.findall(r'\d+', str(years_str))[0])
         except:
             return -1.0
-def match_list(name: str, 
-                  preferred_list: list) -> bool:
+def match_list(name: str, preferred_list: list) -> bool:
     for pref_name in preferred_list:
+        print(f"DEBUG comparing: '{pref_name.lower().strip()}' in '{name.lower().strip()}' = {pref_name.lower().strip() in name.lower().strip()}")
         if pref_name.lower().strip() in name.lower().strip():
             return True
     return False
@@ -71,12 +71,19 @@ def calculate_score(candidate: dict,
     if title_match:
         score+=0.2
         breakdown["title_match"]=0.2
+    print(f"DEBUG title: {candidate['ideal_output']['designation']}")
+    print(f"DEBUG title_match: {title_match}")
 
     company_match=match_list(candidate["ideal_output"]["company_name"],rubric["preferred_companies"])
     if company_match:
         score+=0.1
         breakdown['company_match']=0.1
-    skillmatch,_= check_skills_gate(candidate,rubric)
+    print(f"DEBUG company: {candidate['ideal_output']['company_name']}")
+    print(f"DEBUG company_match: {company_match}")
+    skillmatch,skill_match_detail= check_skills_gate(candidate,rubric)
+    
+    print(f"DEBUG company: {candidate['ideal_output']['skills']}")
+    print(f"DEBUG company_match: {skill_match_detail}")
     if skillmatch:
         score+=0.25# for skills
         breakdown['skillmatch']=0.25

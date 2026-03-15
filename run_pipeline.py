@@ -6,14 +6,14 @@ from classifier import classify_page
 from ner import apply_NER
 from gen_ai_rechecking import validate_and_clean
 from score import calculate_score
-rubric={
-    "domain":["finance","Computer Vision"],
-    "preferred_companies":["Robert Bosch","Goldman","Citi"],
-    "min_years_of_exp":2,
-    "must_have_skills":['Data Science', 'Machine Learning', 'Generative AI', 'Computer Vision', 'NLP', 'CV', 'LLMs', 'Fine-Tuning LLMs', 'Image Processing', 'Object Detection', 'GANs', 'Signal Processing', 'Time Series Analysis', 'Statistical Modeling', 'Model Building & Deployment', 'Hypothesis Testing', 'Data Mining', 'Data Analytics', 'Python', 'SQL', 'HTML', 'CSS', 'Web Development', 'Pandas', 'Spacy', 'NLTK', 'OpenCV', 'Matplotlib/Seaborn', 'Scikit-learn', 'TensorFlow', 'Pytorch', 'Keras', 'Langchain', 'Chainglit', 'Google Data Studio', 'Jupyter Notebooks', 'Docker', 'Git', 'Github', 'Google Search API', 'Python & Web Development'],
-    "preferred_skills":["A/B testing","Statistics"],
-    "minimum_education":"Bachelors",
-    "preferred_titles":["Data Scientist / ML Engineer / AI Engineer"]
+rubric = {
+    "domain": ["Computer Vision"],
+    "preferred_companies": ["Robert Bosch", "Google", "Microsoft"],
+    "min_years_of_exp": 3,
+    "must_have_skills": ["Python", "Machine Learning", "PyTorch", "NLP"],
+    "preferred_skills": ["Docker", "AWS", "LangChain"],
+    "minimum_education": "Bachelor",
+    "preferred_titles": ["Data Scientist", "ML Engineer", "AI Engineer"]
 }
 def run_pipe(pdf_path: str) -> tuple[float, dict]:
     
