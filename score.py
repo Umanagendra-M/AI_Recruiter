@@ -32,31 +32,6 @@ def check_skills_gate(candidate: dict, rubric: dict) -> tuple[bool, str]:
         return False, f"missing must-have skills: {missing}"
     else:
         return True, "skills met"
-# def match_domain(candidate_domain: str, 
-#                  rubric_domains: list) -> bool:
-#     for domain in rubric_domains:
-#         if domain.lower() in candidate_domain.lower():
-#             return True
-#     return False
-# def match_title(candidate_title: str,
-#                 preferred_titles: list) -> bool:
-#     for title in preferred_titles:
-#         if title.lower() in candidate_title.lower():
-#             return True
-#     return False
-# def check_hard_gates(candidate: dict,  rubric: dict) -> tuple[bool, str]:
-#     # GATE 1: years
-#     years = extract_years(candidate["ideal_output"]["years_experience"])
-#     if years < rubric["min_years_of_exp"]:
-#         return False, f"years not met: needs {rubric['min_years_of_exp']}, has {years}"
-
-#     candidate_skills = set([s.lower() for s in candidate["ideal_output"]["skills"]])
-#     must_have = set([s.lower() for s in rubric["must_have_skills"]])
-#     missing = must_have - candidate_skills
-#     if missing:
-#         return False, f"missing must-have skills: {missing}"
-    
-#     return True, "passed all hard gates"
 
 def calculate_score(candidate: dict, 
                     rubric: dict) -> tuple[float, dict]:
