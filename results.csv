@@ -1,0 +1,6 @@
+rank,candidate_name,filename,final_score,domain_score,title_score,company_score,skills_score,experience_score,status,error_message
+1,Surya Teja Menta,resume.pdf,1.0,0.3,0.2,0.1,0.25,0.15,completed,
+2,John Smith,resume_strong.pdf,1.0,0.3,0.2,0.1,0.25,0.15,completed,
+3,David Chen,resume_wrong_domain.pdf,0.35,0,0.2,0,0,0.15,completed,
+4,Lisa Johnson,resume_hard_gate_fail.pdf,0,0,0,0,0,0,completed,
+FAILED,unknown,0.pdf,-1,0,0,0,0,0,ERROR,PDF has no readable text content

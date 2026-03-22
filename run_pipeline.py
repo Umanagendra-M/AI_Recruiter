@@ -39,7 +39,7 @@ def run_pipe(pdf_path: str) -> tuple[float, dict]:
     validated_data = validate_and_clean(resume_data)
     print(f"LLM clean: {time.time()-t2:.2f}s")
     print(f"TOTAL: {time.time()-t0:.2f}s")
-
+    candidate_name = validated_data.get("ideal_output", {}).get("name", "Unknown")
     score, justification = calculate_score(
         validated_data, rubric)
 
@@ -60,7 +60,8 @@ def run_pipe(pdf_path: str) -> tuple[float, dict]:
     update_pipeline_run(conn, run_id, 1, 0, 'completed')
 
     conn.close()
-    return score, justification
+    return score, justification, candidate_name
+
 
 if __name__=="__main__":
     run_pipe(sys.argv[1])
