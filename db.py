@@ -91,3 +91,18 @@ def save_score(conn, resume_id,
     ))
     conn.commit()
     return cur.fetchone()[0]
+
+def save_pii_vault(conn, resume_id, pii_records):
+    cur = conn.cursor()
+    for record in pii_records:
+        cur.execute("""
+            INSERT INTO pii_vault
+                (resume_id, token, pii_type, real_value)
+            VALUES (%s, %s, %s, %s)
+        """, (
+            resume_id,
+            record["token"],
+            record["pii_type"],
+            record["real_value"]
+        ))
+    conn.commit()
