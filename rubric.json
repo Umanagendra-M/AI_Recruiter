@@ -1,0 +1,9 @@
+{
+    "domain": ["Computer Vision"],
+    "preferred_companies": ["Robert Bosch", "Google", "Microsoft"],
+    "min_years_of_exp": 3,
+    "must_have_skills": ["Python", "Machine Learning", "PyTorch", "NLP"],
+    "preferred_skills": ["Docker", "AWS", "LangChain"],
+    "minimum_education": "Bachelor",
+    "preferred_titles": ["Data Scientist", "ML Engineer", "AI Engineer"]
+}

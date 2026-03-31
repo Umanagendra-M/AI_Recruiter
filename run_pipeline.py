@@ -14,16 +14,15 @@ from db import get_connection, save_pipeline_run, \
 
 nlp = spacy.load("en_core_web_sm")
 
-rubric = {
-    "domain": ["Computer Vision"],
-    "preferred_companies": ["Robert Bosch", "Google", "Microsoft"],
-    "min_years_of_exp": 3,
-    "must_have_skills": ["Python", "Machine Learning", "PyTorch", "NLP"],
-    "preferred_skills": ["Docker", "AWS", "LangChain"],
-    "minimum_education": "Bachelor",
-    "preferred_titles": ["Data Scientist", "ML Engineer", "AI Engineer"]
-}
+import json
+import mlflow
 
+# At start of run_pipe():
+mlflow.set_experiment("ai-recruiter")
+
+# Load rubric at startup
+with open("rubric.json", "r") as f:
+    rubric = json.load(f)
 
 def extract_name_spacy(resume_data: list) -> str:
     first_page = resume_data[0].get("page_text", "")
@@ -99,69 +98,76 @@ def extract_and_tokenize_pii(text: str) -> tuple[str, list]:
 
 
 def run_pipe(pdf_path: str) -> tuple[float, dict, str]:
-    conn = get_connection()
-    run_id = save_pipeline_run(conn, total_resumes=1)
+    with mlflow.start_run():
 
-    t0 = time.time()
-    resume_data = get_data(pdf_path)
-    print(f"extract: {time.time()-t0:.2f}s")
+        conn = get_connection()
+        mlflow.log_param("model", "gemma2:2b")
+        mlflow.log_param("pdf", pdf_path)
+        run_id = save_pipeline_run(conn, total_resumes=1)
 
-    t1 = time.time()
-    for page_data in resume_data:
-        page_data["page_label"] = classify_page(
-            page_data["page_text"])
-        page_data["page_ner"] = apply_NER(
-            page_data["page_text"])
-    print(f"classify+NER: {time.time()-t1:.2f}s")
+        t0 = time.time()
+        resume_data = get_data(pdf_path)
+        print(f"extract: {time.time()-t0:.2f}s")
 
-    # Extract name BEFORE masking
-    real_name = extract_name_spacy(resume_data)
-    print(f"Real name extracted: {real_name}")
+        t1 = time.time()
+        for page_data in resume_data:
+            page_data["page_label"] = classify_page(
+                page_data["page_text"])
+            page_data["page_ner"] = apply_NER(
+                page_data["page_text"],rubric)
+        print(f"classify+NER: {time.time()-t1:.2f}s")
 
-    # Save resume first to get resume_id
-    resume_id = save_resume(
-        conn,
-        filename=pdf_path.split("/")[-1],
-        s3_path=f"s3://ai-recruiter/{pdf_path}",
-        page_text=resume_data,
-        pipeline_output={}
-    )
+        # Extract name BEFORE masking
+        real_name = extract_name_spacy(resume_data)
+        print(f"Real name extracted: {real_name}")
 
-    # Tokenize PII in each page
-    all_pii_records = []
-    for page in resume_data:
-        redacted_text, records = extract_and_tokenize_pii(
-            page["page_text"])
-        page["page_text"] = redacted_text
-        all_pii_records.extend(records)
+        # Save resume first to get resume_id
+        resume_id = save_resume(
+            conn,
+            filename=pdf_path.split("/")[-1],
+            s3_path=f"s3://ai-recruiter/{pdf_path}",
+            page_text=resume_data,
+            pipeline_output={}
+        )
 
-    # Save PII vault
-    save_pii_vault(conn, resume_id, all_pii_records)
-    print(f"PII tokens saved: {len(all_pii_records)}")
+        # Tokenize PII in each page
+        all_pii_records = []
+        for page in resume_data:
+            redacted_text, records = extract_and_tokenize_pii(
+                page["page_text"])
+            page["page_text"] = redacted_text
+            all_pii_records.extend(records)
 
-    # LLM sees masked text only
-    t2 = time.time()
-    validated_data = validate_and_clean(resume_data)
-    print(f"LLM clean: {time.time()-t2:.2f}s")
-    print(f"TOTAL: {time.time()-t0:.2f}s")
+        # Save PII vault
+        save_pii_vault(conn, resume_id, all_pii_records)
+        print(f"PII tokens saved: {len(all_pii_records)}")
 
-    # Restore real name in output
-    if validated_data and validated_data.get("ideal_output"):
-        validated_data["ideal_output"]["name"] = real_name
+        # LLM sees masked text only
+        t2 = time.time()
+        validated_data = validate_and_clean(resume_data)
+        print(f"LLM clean: {time.time()-t2:.2f}s")
+        print(f"TOTAL: {time.time()-t0:.2f}s")
 
-    score, justification = calculate_score(
-        validated_data, rubric)
+        # Restore real name in output
+        if validated_data and validated_data.get("ideal_output"):
+            validated_data["ideal_output"]["name"] = real_name
 
-    save_score(conn, resume_id, run_id,
-               score, justification)
+        score, justification = calculate_score(
+            validated_data, rubric)
 
-    update_pipeline_run(conn, run_id, 1, 0, 'completed')
+        save_score(conn, resume_id, run_id,
+                score, justification)
 
-    conn.close()
-    return score, justification, real_name
+        update_pipeline_run(conn, run_id, 1, 0, 'completed')
+
+        conn.close()
+        mlflow.log_metric("final_score", score)
+        mlflow.log_metric("pipeline_time", time.time() - t0)
+        return score, justification, real_name
 
 
 if __name__ == "__main__":
+
     score, justification, name = run_pipe(sys.argv[1])
     print(f"\nCandidate: {name}")
     print(f"Score: {score}")
