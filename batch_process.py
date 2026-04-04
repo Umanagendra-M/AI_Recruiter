@@ -26,8 +26,7 @@ def get_pdfs_from_input(input_path: str) -> tuple[list, str]:
     return pdf_files, working_dir
 
 
-def batch_process(input_path: str,
-                  output_file: str = "results.csv"):
+def batch_process(input_path: str,output_path:str):
     conn = get_connection()
     pdf_files, _ = get_pdfs_from_input(input_path)
 
@@ -105,7 +104,7 @@ def batch_process(input_path: str,
         "error_message"
     ]
 
-    with open(output_file, "w", newline="") as f:
+    with open(output_path, "w", newline="") as f:
         writer = csv.DictWriter(
             f, fieldnames=fieldnames)
         writer.writeheader()
@@ -120,7 +119,7 @@ def batch_process(input_path: str,
     conn.close()
     print(f"\nDone. {processed} processed, "
           f"{failed} failed.")
-    print(f"Results saved to: {output_file}")
+    print(f"Results saved to: {output_path}")
     return results
 
 
@@ -129,3 +128,4 @@ if __name__ == "__main__":
     output = sys.argv[2] if len(sys.argv) > 2 \
              else "results.csv"
     batch_process(input_path, output)
+
