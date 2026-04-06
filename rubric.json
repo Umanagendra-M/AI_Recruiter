@@ -5,5 +5,15 @@
     "must_have_skills": ["Python", "Machine Learning", "PyTorch", "NLP"],
     "preferred_skills": ["Docker", "AWS", "LangChain"],
     "minimum_education": "Bachelor",
-    "preferred_titles": ["Data Scientist", "ML Engineer", "AI Engineer"]
+    "preferred_titles": ["Data Scientist", "ML Engineer", "AI Engineer"],
+    "recruiter_preferred_skills":[    "python", "pytorch", "tensorflow","sklearn", "scikit-learn", "spacy",
+    "docker", "kubernetes", "k8s",
+    "fastapi", "langchain", "sql",
+    "git", "aws", "gcp", "azure",
+    "numpy", "pandas", "huggingface",
+    "transformers", "bert", "llm",
+    "rag", "mlflow", "pydantic",
+    "postgresql", "mongodb", "redis"
+]
+
 }
