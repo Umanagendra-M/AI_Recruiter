@@ -7,11 +7,11 @@ from extractor import get_data
 from classifier import classify_page
 from ner import apply_NER
 from gen_ai_rechecking import validate_and_clean
-from score import calculate_score
+#from score import calculate_score
 from db import get_connection, save_pipeline_run, \
                save_resume, save_score, update_pipeline_run, \
                save_pii_vault
-
+from score import Scorer
 nlp = spacy.load("en_core_web_sm")
 
 import json
@@ -23,6 +23,7 @@ mlflow.set_experiment("ai-recruiter")
 # Load rubric at startup
 with open("rubric.json", "r") as f:
     rubric = json.load(f)
+score_obj=Scorer(rubric)
 
 def extract_name_spacy(resume_data: list) -> str:
     first_page = resume_data[0].get("page_text", "")
@@ -99,7 +100,7 @@ def extract_and_tokenize_pii(text: str) -> tuple[str, list]:
 
 def run_pipe(pdf_path: str) -> tuple[float, dict, str]:
     with mlflow.start_run():
-
+    
         conn = get_connection()
         mlflow.log_param("model", "gemma2:2b")
         mlflow.log_param("pdf", pdf_path)
@@ -152,8 +153,7 @@ def run_pipe(pdf_path: str) -> tuple[float, dict, str]:
         if validated_data and validated_data.get("ideal_output"):
             validated_data["ideal_output"]["name"] = real_name
 
-        score, justification = calculate_score(
-            validated_data, rubric)
+        score, justification = score_obj.calculate_score(validated_data)
 
         save_score(conn, resume_id, run_id,
                 score, justification)
