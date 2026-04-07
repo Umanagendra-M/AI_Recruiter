@@ -4,10 +4,7 @@ import json
 import re
 import spacy
 from extractor import get_data
-from classifier import classify_page
-from ner import apply_NER
 from gen_ai_rechecking import validate_and_clean
-#from score import calculate_score
 from db import get_connection, save_pipeline_run, \
                save_resume, save_score, update_pipeline_run, \
                save_pii_vault
