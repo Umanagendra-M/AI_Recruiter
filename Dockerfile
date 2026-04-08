@@ -15,9 +15,9 @@ RUN pip install fastapi uvicorn python-multipart \
 RUN pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl
 
 # Copy app files
-COPY *.py .
-COPY rubric.json .
-COPY schema.sql .
+COPY *.py ./
+COPY rubric.json ./
+COPY schema.sql ./
 
 EXPOSE 8000
 
