@@ -17,15 +17,16 @@ class NumpyEncoder(json.JSONEncoder):
             return obj.tolist()
         return super().default(obj)
     
+import os
+
 def get_connection():
     return psycopg2.connect(
-        host="127.0.0.1",
-        port=5433,
-        database="ai_recruiter",
-        user="uma",
-        password="password123"
+        host=os.environ.get("DB_HOST", "127.0.0.1"),
+        port=int(os.environ.get("DB_PORT", "5433")),
+        database=os.environ.get("DB_NAME", "ai_recruiter"),
+        user=os.environ.get("DB_USER", "uma"),
+        password=os.environ.get("DB_PASSWORD", "password123")
     )
-
 def save_resume(conn, filename, s3_path,
                 page_text, pipeline_output):
     cur = conn.cursor()

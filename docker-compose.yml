@@ -16,9 +16,12 @@ services:
       - MINIO_BUCKET=ai-recruiter
       - OLLAMA_HOST=http://ollama:11434
     depends_on:
-      - db
-      - minio
-      - ollama
+      db:
+        condition: service_healthy
+      minio:
+        condition: service_started
+      ollama:
+        condition: service_started
     volumes:
       - ./data:/app/data
       - huggingface_cache:/root/.cache/huggingface
@@ -35,6 +38,13 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U uma -d ai_recruiter"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
 
   minio:
     image: quay.io/minio/minio
@@ -56,6 +66,11 @@ services:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
+    entrypoint: >
+      /bin/sh -c "ollama serve &
+      sleep 10 &&
+      ollama pull gemma2:2b &&
+      tail -f /dev/null"
 
 volumes:
   postgres_data:
