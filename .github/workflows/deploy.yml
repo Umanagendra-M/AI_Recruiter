@@ -37,9 +37,17 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
           script: |
-            cd AI_Recruiter
-            git pull origin main
-            docker-compose up -d --build
+            # Clone if not exists, pull if exists
+            if [ -d "AI_Recruiter" ]; then
+              cd AI_Recruiter
+              git pull origin main
+            else
+              git clone https://github.com/Umanagendra-M/AI_Recruiter
+              cd AI_Recruiter
+            fi
+            
+            # Use docker compose (v2 syntax)
+            docker compose up -d --build
             sleep 15
             curl -f http://localhost:8000/health || exit 1
             echo "Deploy successful"
