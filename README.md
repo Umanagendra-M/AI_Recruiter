@@ -1,48 +1,49 @@
-phase 1:
+planned architecture
+
+PDF Upload
+    |
+Extraction (pdfplumber)
+    |
+Page Classification (bart-large-mnli)
+    |
+NER + EntityRuler (BERT + spaCy)
+    |
+PII Tokenization (spaCy + regex)
+    |
+LLM Extraction (Gemma2:2b via Ollama)
+    |
+Scorer (rubric-based weighted scoring)
+    |
+PostgreSQL + MinIO + MLflow
+    |
+FastAPI REST API(user view the data)
+
+API endpoints
+GET  /health   - system status
+POST /upload   - upload PDF to MinIO
+POST /score    - score single resume
+POST /batch    - score ZIP of resumes
+
+tech stack
+API Framework   FastAPI + Pydantic
+Page Classifier facebook/bart-large-mnli
+NER Model       yashpwr/resume-ner-bert-v2
+PII Detection   spaCy en_core_web_sm + regex
+LLM             Gemma2:2b via Ollama
+Database        PostgreSQL with JSONB
+File Storage    MinIO (S3 compatible)
+Experiment      MLflow
+CI/CD           GitHub Actions
+Cloud           AWS EC2, AWS EKS
+Containers      Docker + Docker Compose
+
+run local commands:
+
+git clone https://github.com/Umanagendra-M/AI_Recruiter
+cd AI_Recruiter
+docker compose up -d
 
 
-resume processing page type classification
-resume page data extraction
-page classification......> skills|experience|other
-NER ---> org,name,location,skill,date,job title,domain keyword.
-Job title + company + tenure ?
-Skills scan                  ?
-Domain fit evidence          ?  
-
-LLM reconcilation check the extraction vs reality
-
-create a dummy rubric setup
-score the extracted data
-
-sort the resumes.
-
-
-
-phase 2 backlog:
-
-create the rubric setup(editable)
-
-resume with multicolumns.
-
-
-
-##################################
-## Phase 1 — COMPLETE 
-Pipeline working end to end.
-PDF → extract → classify → NER → 
-LLM clean → score → JSON output
-
-## Phase 2 Backlog
-- Columnar PDF handling
-- NER model replacement
-- np.float32 serialization fix
-- Score breakdown missing experience_level
-- Deduplicate LLM output
-- Editable rubric UI for Sarah
-- Company domain lookup (Wikipedia Phase 3)
-
-## Tomorrow
-- Clean up hardcoded paths
-- Move to proper folder structure
-- Write Sarah demo script
-- Prepare questions for Sarah meeting
+testing
+curl http://localhost:8000/health
+curl -X POST http://localhost:8000/score -F "file=@data/resume.pdf"
