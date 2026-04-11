@@ -31,3 +31,15 @@ ecs-task-definition.json
 # IDE
 .vscode/
 .idea/".env" 
+
+
+.env
+mlflow.db
+*.db
+final_result.txt
+__pycache__/
+minio/
+score.py
+test_db.py
+mlruns/
+*.pyc
