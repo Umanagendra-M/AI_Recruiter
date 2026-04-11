@@ -30,4 +30,4 @@ ecs-task-definition.json
 
 # IDE
 .vscode/
-.idea/
+.idea/".env" 
