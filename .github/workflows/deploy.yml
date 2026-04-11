@@ -30,40 +30,52 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@master
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_KEY }}
-          script: |
-            if ! command -v docker &> /dev/null; then
-              curl -fsSL https://get.docker.com -o get-docker.sh
-              sudo sh get-docker.sh
-              sudo usermod -aG docker ubuntu
-              sudo systemctl start docker
-              sudo systemctl enable docker
-            fi
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
 
-            if [ -d "AI_Recruiter" ]; then
-              cd AI_Recruiter
-              git pull origin main
-            else
-              git clone https://github.com/Umanagendra-M/AI_Recruiter
-              cd AI_Recruiter
-            fi
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
-            sudo docker compose up -d --build
+      - name: Build and push image to ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ai-recruiter
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
-            echo "Waiting for API to start..."
-            for i in $(seq 1 18); do
-              if curl -f -s http://localhost:8000/health > /dev/null 2>&1; then
-                echo "API is ready!"
-                break
-              fi
-              echo "Attempt $i/18 - waiting 10 seconds..."
-              sleep 10
-            done
+      - name: Generate task definition
+        run: |
+          sed 's/AWS_ACCOUNT_ID/${{ secrets.AWS_ACCOUNT_ID }}/g' \
+            ecs-task-definition.template.json > ecs-task-definition.json
 
-            curl -f http://localhost:8000/health || exit 1
-            echo "Deploy successful"
+      - name: Register task definition
+        run: |
+          aws ecs register-task-definition \
+            --cli-input-json file://ecs-task-definition.json \
+            --region us-east-2
+
+      - name: Deploy to ECS
+        run: |
+          aws ecs update-service \
+            --cluster ai-recruiter-cluster \
+            --service ai-recruiter-service \
+            --force-new-deployment \
+            --region us-east-2
+
+      - name: Wait for deployment
+        run: |
+          aws ecs wait services-stable \
+            --cluster ai-recruiter-cluster \
+            --services ai-recruiter-service \
+            --region us-east-2
+          echo "ECS deployment successful"
+

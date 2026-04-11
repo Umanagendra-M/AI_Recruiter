@@ -1,0 +1,33 @@
+# Environment files
+.env
+.env.local
+.env.production
+
+# AWS credentials
+.aws/
+*.pem
+*.key
+
+# Secrets
+secrets/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Docker
+minio/
+
+# Generated files
+mlruns/
+mlflow.db
+results.csv
+*.csv
+ecs-task-definition.json
+
+
+# IDE
+.vscode/
+.idea/

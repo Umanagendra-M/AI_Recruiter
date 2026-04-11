@@ -1,0 +1,68 @@
+{
+    "family": "ai-recruiter-task",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": ["FARGATE"],
+    "cpu": "4096",
+    "memory": "8192",
+    "executionRoleArn": "arn:aws:iam::AWS_ACCOUNT_ID:role/ecsTaskExecutionRole",
+    "containerDefinitions": [
+        {
+            "name": "ai-recruiter-api",
+            "image": "AWS_ACCOUNT_ID.dkr.ecr.us-east-2.amazonaws.com/ai-recruiter:latest",
+            "portMappings": [
+                {
+                    "containerPort": 8000,
+                    "protocol": "tcp"
+                }
+            ],
+            "environment": [
+                {"name": "DB_PORT", "value": "5433"},
+                {"name": "DB_NAME", "value": "ai_recruiter"},
+                {"name": "DB_USER", "value": "uma"},
+                {"name": "MINIO_ACCESS_KEY", "value": "admin"},
+                {"name": "MINIO_BUCKET", "value": "ai-recruiter"},
+                {"name": "GIT_PYTHON_REFRESH", "value": "quiet"}
+            ],
+            "secrets": [
+                {
+                    "name": "DB_HOST",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-2:AWS_ACCOUNT_ID:secret:ai-recruiter/db-host"
+                },
+                {
+                    "name": "DB_PASSWORD",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-2:AWS_ACCOUNT_ID:secret:ai-recruiter/db-password"
+                },
+                {
+                    "name": "MINIO_ENDPOINT",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-2:AWS_ACCOUNT_ID:secret:ai-recruiter/minio-endpoint"
+                },
+                {
+                    "name": "MINIO_SECRET_KEY",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-2:AWS_ACCOUNT_ID:secret:ai-recruiter/minio-secret-key"
+                },
+                {
+                    "name": "OLLAMA_HOST",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-2:AWS_ACCOUNT_ID:secret:ai-recruiter/ollama-host"
+                }
+            ],
+            "healthCheck": {
+                "command": [
+                    "CMD-SHELL",
+                    "curl -f http://localhost:8000/health || exit 1"
+                ],
+                "interval": 30,
+                "timeout": 10,
+                "retries": 5,
+                "startPeriod": 200
+            },
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/ai-recruiter",
+                    "awslogs-region": "us-east-2",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            }
+        }
+    ]
+}
